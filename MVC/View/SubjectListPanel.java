@@ -2,6 +2,7 @@ package MVC.View;
 
 import MVC.Controller.MainController;
 import MVC.Model.Subject;
+import com.sun.tools.javac.Main;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.swing.*;
@@ -51,6 +52,7 @@ public class SubjectListPanel extends JPanel {
         eastPanel.add(deckEditButton);
 
         JButton startGame = new JButton("Start game!");
+        startGame.addActionListener(e -> SubjectListPanel.this.startGame());
         eastPanel.add(startGame);
 
         JButton logout = new JButton("Logout");
@@ -72,4 +74,8 @@ public class SubjectListPanel extends JPanel {
         new DeckEditDialog(owner, MainController, subjectList.getSelectedValue());
     }
 
+    private void startGame(){
+        new StartGameDialog(owner, MainController, subjectList.getSelectedValue());
+
+    }
 }

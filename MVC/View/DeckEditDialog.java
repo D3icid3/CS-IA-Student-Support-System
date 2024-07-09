@@ -13,13 +13,14 @@ import java.awt.event.WindowEvent;
 public class DeckEditDialog extends JDialog {
 
     private MainController MainController;
+    private JFrame deckOwner;
 
     private JList<Card> cardList;
 
     DeckEditDialog(JFrame owner, MainController MainController, Subject subject) {
         super(owner, true);
+        deckOwner = owner;
         this.MainController = MainController;
-
         initComponents(subject);
         pack();
         setLocationRelativeTo(owner);
@@ -65,13 +66,17 @@ public class DeckEditDialog extends JDialog {
      * Exclaim: all handlers below still needed to be done
      * C- mostly cmndC cmndV from Subject add/SubjectListPanel
      */
+
     private void addHandler() {
+        new CardAddDialog(deckOwner, MainController);
+
     }
 
     private void editHandler() {
+        new UpdateCardDialog(deckOwner, MainController);
     }
 
-    private void removeHandler() {
+    private void removeHandler() {MainController.removeCard(cardList.getSelectedValue());
     }
 
 }

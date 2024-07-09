@@ -11,7 +11,7 @@ public interface ChangeActivePanelListener {
      */
 
     enum PanelName {
-        LOGIN, SUBJECT_LIST;
+        LOGIN, SUBJECT_LIST, EDIT_DECK;
     }
 
 }

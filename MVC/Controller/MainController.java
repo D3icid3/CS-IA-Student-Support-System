@@ -11,6 +11,7 @@ import MVC.Utility.DbException;
 
 import javax.swing.*;
 import java.util.List;
+import java.util.Objects;
 
 public class MainController {
 
@@ -53,15 +54,21 @@ public class MainController {
 
 
 
-    public void addSubject(Subject subject) {
+    public void addSubject(Subject subject, User user) {
         try {
-            subject = SubjectDb.addSubject(subject);
+            subject = SubjectDb.addSubject(subject, user);
             model.addSubject(subject);
         } catch (DbException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Database error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    public void addCard(Card card, Subject subject) {
+        try {
+            card = CardDb.addCard(subject, card);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Database error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
     public ListModel<Subject> getSubjectListModel() {
         return model.getSubjectListModel();
     }
@@ -74,6 +81,23 @@ public class MainController {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Database error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    public void removeCard(Card card) {
+        try {
+            CardDb.deleteCard(card);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Database error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void updateCard(Card card, String newFront, String newBack){
+        try{
+            CardDb.updateCard(card,newFront, newBack);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public User login(String loginName, String password) throws Exception {
         User user = LoginDb.login(loginName,password);
         loadData(user);
@@ -92,6 +116,20 @@ public class MainController {
         return model.getCardListModel(subject);
     }
 
+    public int RandomCard(Subject subject) {
+        try {
+            int ids;
+            ids = CardDb.randomCard(subject);
+            return ids;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Database error", JOptionPane.ERROR_MESSAGE);
+        }
+        return 0;
+    }
+
+    public String getCardFront(int cardId){
+        return CardDb.getCardFront(cardId);
+    }
     public void logout() {
         model.clearSubjects(); //clears subjects and cards off of the list once signed out so it does not dupe
         model.clearCards();

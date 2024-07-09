@@ -18,6 +18,10 @@ public class SubjectDb {
      */
 
     private static String SQL_GET_SUBJECTS = "SELECT * FROM subject ORDER BY name";
+
+
+
+    private static String SQL_GET_USER_SPECIFIC_SUBJECTS = "SELECT * FROM subject where user_id = ?";
     private static String SQL_ADD_SUBJECT = "INSERT INTO subject (name) VALUES (?)";
     private static String SQL_DELETE_SUBJECT = "DELETE FROM subject WHERE id = ?";
     private static String SQL_MODIFY_SUBJECT = "UPDATE subject SET name=? WHERE id=?";
@@ -28,6 +32,27 @@ public class SubjectDb {
      * @return
      * @throws Exception
      */
+    public static List<Subject> getallSubjects() throws Exception {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<Subject> subjects = new ArrayList<>(); //array list == dynamic array
+        Connection connection = DbHelper.getInstance().getConnection();
+        try {
+            ps = connection.prepareStatement(SQL_GET_SUBJECTS);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id"));
+                subject.setName(rs.getString("name"));
+                subjects.add(subject);
+            }
+            System.out.println(MessageFormat.format("(DB) [{0}] subject(s) loaded", subjects.size()));
+            return subjects;
+        } finally {
+            DbHelper.close(rs);
+            DbHelper.close(ps);
+        }
+    }
     public static List<Subject> getSubjects() throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -77,7 +102,7 @@ public class SubjectDb {
      * @return new subject with generated ID
      * @throws Exception
      */
-    public static Subject addSubject(Subject subject) throws DbException {
+    public static Subject addSubject(Subject subject, User user) throws DbException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         Connection connection = DbHelper.getInstance().getConnection();
@@ -90,6 +115,7 @@ public class SubjectDb {
             if (rs.next()) {
                 newSubject.setId(rs.getInt(1));
             }
+            newSubject.setUser_id(user.getId());
             newSubject.setName(subject.getName());
             System.out.println(MessageFormat.format("(DB) Subject [{0}]:[{1}] added", newSubject.getId(), newSubject.getName()));
             return newSubject;

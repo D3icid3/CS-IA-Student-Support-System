@@ -4,7 +4,7 @@ public class Subject {
     private int id;
     private String name;
 
-    private int subjectId;
+    private int user_Id;
 
     public int getId() {
         return id;
@@ -22,11 +22,9 @@ public class Subject {
         this.name = name;
     }
 
-    public void setSubjectId(int subjectId){
-        this.subjectId = subjectId ;
-    }
+    public int getUserId(){return user_Id;}
+    public void setUser_id(int user_Id){this.user_Id = user_Id;}
 
-    public int getSubjectId(){return id;}
 
     public Subject withName(String name) {
         setName(name);
@@ -37,5 +35,6 @@ public class Subject {
     public String toString() {
         return name;
     }
+
 
 }

@@ -21,6 +21,12 @@ public class LoginDb {
 
     private static String SQL_REGISTER = "INSERT INTO user VALUES (?,?,?);";
 
+    private static String SQL_GET_CURRENT_USER_LOGED_IN = "SELECT * FROM currentuser";
+
+    private static String SQL_INSERT_CURRENT = "INSERT INTO currentuser VALUES(?);";
+
+    private static String SQL_TRUNCATE_CURRENT = "TRUNCATE TABLE currentuser;";
+
     /**
      *
      * @param loginName
@@ -33,12 +39,20 @@ public class LoginDb {
     public static User login(String loginName, String password) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
+        PreparedStatement psCurrent = null;
+        PreparedStatement psTrunc = null;
+
         try {
             Connection connection = DbHelper.getInstance().getConnection();
+
+            //C-prepared statement for data verification
             ps = connection.prepareStatement(SQL_LOGIN);
             ps.setString(1, loginName);
             ps.setString(2, password);
             rs = ps.executeQuery();
+
+
+
             // we expect one user
             if (rs.next()) {
                 // we found the user in the database
@@ -46,6 +60,15 @@ public class LoginDb {
                 User user = new User();
                 user.setId(rs.getInt(1));
                 user.setUserName(loginName);
+
+                //C-Truncates current user table
+                psTrunc = connection.prepareStatement(SQL_TRUNCATE_CURRENT);
+                psTrunc.executeUpdate();
+
+                //C-prepared statement for current user DB
+                psCurrent = connection.prepareStatement(SQL_INSERT_CURRENT);
+                psCurrent.setString(1, String.valueOf(rs.getInt(1)));
+                psCurrent.executeUpdate();
                 return user;
             } else {
                 throw new Exception("user not found");

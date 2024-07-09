@@ -6,10 +6,7 @@ import MVC.Model.User;
 import MVC.Utility.DbException;
 import MVC.Utility.DbHelper;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +18,13 @@ public class CardDb {
      */
 
     private static String SQL_GET_CARDS_BY_SUBJECT = "SELECT * FROM card WHERE subject_id = ?";
-    private static String SQL_ADD_CARD = "INSERT INTO card (subject_id, front, back) VALUES (?,?,?)";
+    private static String SQL_ADD_CARD = "INSERT INTO card (front, back, subject_id) VALUES (?,?,?)";
     private static String SQL_DELETE_CARD = "DELETE FROM card WHERE id=?";
     private static String SQL_MODIFY_CARD = "UPDATE card SET subject_id=?, front=?, back=? WHERE id=?";
+
+    private static String SQL_RANDOM_CARD = "SELECT * FROM card ORDER BY RAND() LIMIT 1;";
+
+    private static String SQL_GET_CARD_FRONT = "SELECT * FROM card WHERE id = ?;";
 
     /**
      * get the list of every card filtered by the subject
@@ -80,33 +81,31 @@ public class CardDb {
         }
     }
 
-    /**
-     * add a new card to the database
+    /***
      *
      * @param subject
-     * @param front
-     * @param back
+     * @param card
      * @return
      * @throws Exception
      */
-    public static Card addCard(Subject subject, String front, String back) throws Exception {
+    public static Card addCard(Subject subject, Card card) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         Connection connection = DbHelper.getInstance().getConnection();
         try {
             ps = connection.prepareStatement(SQL_ADD_CARD, Statement.RETURN_GENERATED_KEYS);
-            ps.setInt(1, subject.getId());
-            ps.setString(2, front);
-            ps.setString(3, back);
+            ps.setString(1, card.getFront());
+            ps.setString(2, card.getBack());
+            ps.setInt(3, subject.getId());
+
             ps.executeUpdate();
-            Card card = new Card();
             rs = ps.getGeneratedKeys();
             if (rs.next()) {
                 card.setId(rs.getInt(1));
             }
             card.setSubjectId(subject.getId());
-            card.setFront(front);
-            card.setBack(back);
+            card.setFront(card.getFront());
+            card.setBack(card.getBack());
             System.out
                     .println(MessageFormat.format("(DB) Card [{0}:{1}] added to subject [{2}]", card.getFront(), card.getBack(), subject.getName()));
             return card;
@@ -130,6 +129,49 @@ public class CardDb {
             ps.executeUpdate();
             System.out.println(
                     MessageFormat.format("(DB) Card [{0}] [{1}/{2}] removed", cardToRemove.getId(), cardToRemove.getFront(), cardToRemove.getBack()));
+        } finally {
+            DbHelper.close(ps);
+        }
+    }
+    public static int randomCard(Subject subject) throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Connection connection = DbHelper.getInstance().getConnection();
+        String front,back;
+        int ids;
+        try{
+            ps = connection.prepareStatement(SQL_RANDOM_CARD, Statement.RETURN_GENERATED_KEYS);
+            ps.executeUpdate();
+            rs = ps.getGeneratedKeys();
+            Card card = new Card();
+            if (rs.next()) {
+                card.setId(rs.getInt(1));
+            }
+            card.setSubjectId(subject.getId());
+            card.setFront(card.getFront());
+            card.setBack(card.getBack());
+            ids = card.getId();
+            return ids;
+        } finally {
+            DbHelper.close(ps);
+        }
+    }
+
+    public static String getCardFront(int cardId){
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Connection connection = DbHelper.getInstance().getConnection();
+        String front = "";
+        try{
+            ps = connection.prepareStatement(SQL_GET_CARD_FRONT, Statement.RETURN_GENERATED_KEYS);
+            ps.executeUpdate();
+            rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                front = rs.getString(1);
+            }
+            return front;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         } finally {
             DbHelper.close(ps);
         }

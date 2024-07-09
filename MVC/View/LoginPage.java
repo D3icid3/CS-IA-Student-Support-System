@@ -17,6 +17,8 @@ public class LoginPage extends JPanel implements ClearLoginPageListener {
 
     private JTextField usernameField;
 
+    private JPasswordField passwordField;
+
     /*
     public static void main(String[] args) {
         FlashCardsModel model = new FlashCardsModel();
@@ -76,7 +78,7 @@ public class LoginPage extends JPanel implements ClearLoginPageListener {
         add(passwordLabel, constraints);
 
         //Password field that hides input
-        JPasswordField passwordField = new JPasswordField(20);
+        passwordField = new JPasswordField(20);
         constraints.gridx = 1;
         constraints.gridy = 2;
         constraints.gridwidth = 1;
@@ -136,7 +138,9 @@ public class LoginPage extends JPanel implements ClearLoginPageListener {
 
     public void clearLoginPage() {
         usernameField.setText("");
+        passwordField.setText("");
     }
+
 
 }
 

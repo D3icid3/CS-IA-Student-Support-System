@@ -43,4 +43,8 @@ public class    FlashCardsModel {
     public void clearCards() {
         cardModels.clear();
     }
+
+    public void deleteCard(Card card) {
+        cardModels.remove(card);
+    }
 }
